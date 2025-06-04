@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tỏ Tình 5D - Trái Tim 3D Ngầu Lòi</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff5e62, #ff9a9e, #fff1eb);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            color: #fff;
+            z-index: 2;
+            animation: fadeIn 2s ease-in-out;
+        }
+        h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        .letter-content {
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            font-size: 1.5em;
+            margin: 20px 0;
+            max-width: 600px;
+        }
+        .letter-content.show {
+            opacity: 1;
+        }
+        .confess-btn {
+            padding: 12px 30px;
+            background: #ff2d55;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .confess-btn:hover {
+            background: #e91e63;
+            transform: scale(1.1);
+        }
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.5);
+            animation: sparkle 2s linear infinite;
+            z-index: 0;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes glow {
+            0% { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); }
+            100% { text-shadow: 2px 2px 8px rgba(255, 45, 85, 0.7); }
+        }
+        @keyframes sparkle {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-30vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            .letter-content {
+                font-size: 1.2em;
+            }
+            .confess-btn {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <audio id="background-music" autoplay loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-sweet.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    <canvas id="canvas"></canvas>
+    <div class="container">
+        <h1>Trái Tim Anh Thuộc Về Em</h1>
+        <button class="confess-btn" onclick="showLetter()">Đọc Lời Tỏ Tình</button>
+        <div class="letter-content" id="letter-part-1">
+            <p>Em à, mỗi nhịp tim anh đều gọi tên em. Anh thích em từ cái nhìn đầu tiên.</p>
+        </div>
+        <div class="letter-content" id="letter-part-2">
+            <p>Em là ánh sáng, là lý do anh mỉm cười mỗi ngày. Hãy để anh được bên em.</p>
+        </div>
+        <div class="letter-content" id="letter-part-3">
+            <p>Làm người yêu anh nhé, anh hứa sẽ làm em hạnh phúc mãi mãi! ❤️</p>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const heartShape = new THREE.Shape();
+        heartShape.moveTo(0, -2);
+        heartShape.quadraticCurveTo(2, -4, 4, -2);
+        heartShape.quadraticCurveTo(5, -1, 5, 0);
+        heartShape.quadraticCurveTo(5, 1, 4, 2);
+        heartShape.quadraticCurveTo(2, 4, 0, 2);
+        heartShape.quadraticCurveTo(-2, 4, -4, 2);
+        heartShape.quadraticCurveTo(-5, 1, -5, 0);
+        heartShape.quadraticCurveTo(-5, -1, -4, -2);
+        heartShape.quadraticCurveTo(-2, -4, 0, -2);
+
+        const extrudeSettings = { depth: 1, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.5, bevelThickness: 0.5 };
+        const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+        const material = new THREE.MeshPhongMaterial({ color: 0xff2d55, shininess: 100 });
+        const heart = new THREE.Mesh(geometry, material);
+        scene.add(heart);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 0.8);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        camera.position.z = 10;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            heart.rotation.y += 0.01;
+            heart.rotation.x += 0.005;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.top = Math.random() * 100 + 'vh';
+            particle.style.animationDuration = Math.random() * 1.5 + 1.5 + 's';
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 2000);
+        }
+
+        function showLetter() {
+            const parts = document.querySelectorAll('.letter-content');
+            parts.forEach((part, index) => {
+                setTimeout(() => part.classList.add('show'), index * 2000);
+            });
+            document.querySelector('.confess-btn').style.display = 'none';
+            document.getElementById('background-music').play();
+        }
+
+        setInterval(createParticle, 300);
+    </script>
+</body>
+</html>
